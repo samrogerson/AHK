@@ -7,13 +7,13 @@ DDWindowName:="Dungeon Defenders"
 DDReadyKey:="h"
 DDJoyReadyKey:="c"
 ;   Whether to try and repair buildings
-DoRepair:=true
+DoRepair:=false
 ;   How many repairs
 RepairLoops:=4
 ;   How long to wait between repairs (adjust for casting rate)
 RepairWait:=1000
 ;   Whether to try and upgrade buildings
-DoUpgrade:=true
+DoUpgrade:=false
 ;   How many upgrades
 UpgradeLoops:=2
 ;   How long to wait between upgrades (adjust for casting rate)
@@ -25,10 +25,8 @@ SelectKey:="{LButton}"
 TakeFocus:=true
 NHeroes:=2
 
-
 ; INTERNAL OPTION
-Active:=true
-
+Active:=false
 
 ; Control + Shift + g
 ^+g::StartAfk()
@@ -46,7 +44,7 @@ Active:=true
 ; Control + Shift + r
 ^+u::
     DoUpgrade:=!DoUpgrade
-    Alert("Upgrade" . DoUpgrade)
+    Alert("Upgrade " . DoUpgrade)
     return
 ^+Up::
     NHeroes++
@@ -56,6 +54,16 @@ Active:=true
     NHeroes--
     Alert("NHeroes = " . NHeroes)
     return
+
+SendToChat(msg) {
+    global DDWindowName
+    ControlSend,,y,%DDWindowName%
+    Sleep 500
+    ControlSend,,%msg%,%DDWindowName%
+    sleep 500
+    ControlSend,,{Enter},%DDWindowName%
+}
+    
     
 Alert(msg) {
     TrayTip, Afk Script, %msg%
@@ -73,7 +81,7 @@ ReadyUp(takefocus=false,heroes=1) {
     global DDWindowName, DDReadyKey, DDJoyReadyKey
     SetKeyDelay,,500
     ControlSend,,%DDReadyKey%,%DDWindowName%
-    if takefocus {
+    if takefocus and heroes > 1 {
         WinGet, original_active, ID, A
         WinActivate, %DDWindowName%
         Loop {
@@ -119,6 +127,7 @@ StartAfk() {
             Upgrade()
         if DoRepair
             Repair()
+        sleep 3000
     }
     Alert("Script stopped")
     Sleep 3000
